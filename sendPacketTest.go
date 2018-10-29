@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/dmichael/go-multicast/multicast"
-	"github.com/urfave/cli"
 )
 
 type networkOpt struct {
@@ -57,6 +55,7 @@ func getInterfaces() []string {
 				muls := []string{}
 				for _, m := range mulAddr {
 					if strings.Contains(m.String(), ".") {
+						fmt.Println(net.ParseIP(m.String()).IsLinkLocalMulticast())
 						muls = append(muls, m.String())
 					}
 				}
@@ -68,15 +67,7 @@ func getInterfaces() []string {
 }
 
 func startPinger(addr string) {
-	app := cli.NewApp()
-
-	app.Action = func(c *cli.Context) error {
-		fmt.Printf("Broadcasting to %s\n", addr)
-		ping(addr)
-		return nil
-	}
-
-	app.Run(os.Args)
+	ping(addr)
 }
 
 func ping(addr string) {
@@ -85,10 +76,12 @@ func ping(addr string) {
 		log.Fatal(err)
 	}
 
-	for {
-		conn.Write([]byte("walter hahaha\n"))
-		time.Sleep(1 * time.Second)
-	}
+	go func() {
+		for {
+			conn.Write([]byte("walter hahaha\n"))
+			time.Sleep(1 * time.Second)
+		}
+	}()
 }
 
 func msgHandler(src *net.UDPAddr, n int, b []byte) {
@@ -97,15 +90,7 @@ func msgHandler(src *net.UDPAddr, n int, b []byte) {
 }
 
 func startListener(addr string) {
-	app := cli.NewApp()
-
-	app.Action = func(c *cli.Context) error {
-		fmt.Printf("Listening on %s\n", addr)
-		multicast.Listen(addr, msgHandler)
-		return nil
-	}
-
-	app.Run(os.Args)
+	go multicast.Listen(addr, msgHandler)
 }
 
 func main() {
@@ -118,7 +103,7 @@ func main() {
 	}()
 
 	go func() {
-		startListener(IPMap["en8-192.168.15.20"].multicastIP[0] + defaultPort)
+		startListener(IPMap["en8-192.168.16.20"].multicastIP[0] + defaultPort)
 	}()
 
 	stop := make(chan bool)
