@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -53,7 +54,7 @@ func getInterfaces() []string {
 				name := i.Name
 				ip := strings.Split(a.String(), "/")[0]
 				result = append(result, name+ip)
-				IPMap[name+"-"+ip] = networkOpt{name: name, IP: ip, hwAddress: i.HardwareAddr}
+				IPMap[name] = networkOpt{name: name, IP: ip, hwAddress: i.HardwareAddr}
 			}
 		}
 	}
@@ -114,9 +115,14 @@ func main() {
 	fmt.Println(opts)
 	fmt.Println(IPMap)
 
-	go startSendMessages(IPMap["en7-192.168.15.10"].name, IPMap["en8-192.168.15.20"].name, "walter")
+	from := flag.String("s", "", "source interface name")
+	to := flag.String("d", "", "destination interface name")
+	msg := flag.String("m", "walter", "msg to send")
+	flag.Parse()
 
-	go startReceiveMessages(IPMap["en8-192.168.15.20"].name)
+	go startSendMessages(IPMap[*from].name, IPMap[*to].name, *msg)
+
+	go startReceiveMessages(IPMap[*to].name)
 
 	stop := make(chan bool)
 	stop <- true
