@@ -13,6 +13,7 @@ import (
 )
 
 type networkOpt struct {
+	Idx       int
 	name      string
 	IP        string
 	hwAddress net.HardwareAddr
