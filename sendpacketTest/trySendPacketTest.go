@@ -86,7 +86,7 @@ func startSendMessages(from, to, msg string) {
 	}
 
 	handler, err := pcap.OpenLive(from, 1600, true, pcap.BlockForever)
-	check("openlive", err)
+	check("openlive send", err)
 	for {
 		time.Sleep(time.Second)
 		fmt.Println("send")
@@ -99,7 +99,7 @@ func startSendMessages(from, to, msg string) {
 func startReceiveMessages(ifName string) {
 	fmt.Println("start receive")
 	handle, err := pcap.OpenLive(ifName, 1600, true, pcap.BlockForever)
-	check("openlive", err)
+	check("openlive receive", err)
 
 	for {
 		fmt.Println("read")
