@@ -66,8 +66,10 @@ func getInterfaces() []string {
 func startSendMessages(from, to, msg string) {
 	fmt.Println("start send")
 	// // Message is broadcast to all machines in same network segment.
+	fmt.Println("fromIfi name", from)
 	fromIfi, err := net.InterfaceByName(from)
 	check("from ifi error", err)
+	fmt.Println("toIfi name", to)
 	toIfi, err := net.InterfaceByName(to)
 	check("to ifi err", err)
 
@@ -85,7 +87,9 @@ func startSendMessages(from, to, msg string) {
 		log.Fatalf("failed to marshal ethernet frame: %v", err)
 	}
 
-	handler, err := pcap.OpenLive(from, 1600, true, pcap.BlockForever)
+	fmt.Println("openlive => ", to)
+
+	handler, err := pcap.OpenLive(to, 1600, true, pcap.BlockForever)
 	check("openlive send", err)
 	for {
 		time.Sleep(time.Second)
