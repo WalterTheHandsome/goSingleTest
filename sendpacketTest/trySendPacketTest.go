@@ -121,14 +121,20 @@ func main() {
 	fmt.Println(opts)
 	fmt.Println(IPMap)
 
-	from := flag.Int("s", -1, "source interface name")
-	to := flag.Int("d", -1, "destination interface name")
+	from := flag.Int("from", -1, "source interface index")
+	to := flag.Int("to", -1, "destination interface index")
+	fromName := flag.String("fName", "none", "source interface name")
+	toName := flag.String("toName", "none", "destination interface name")
 	msg := flag.String("m", "walter", "msg to send")
 	flag.Parse()
 
-	go startSendMessages(IPMap[*from].name, IPMap[*to].name, *msg)
-
-	go startReceiveMessages(IPMap[*to].name)
+	if *fromName != "none" && *toName != "none" {
+		go startReceiveMessages(*toName)
+		go startSendMessages(*fromName, *toName, *msg)
+	} else {
+		go startReceiveMessages(IPMap[*to].name)
+		go startSendMessages(IPMap[*from].name, IPMap[*to].name, *msg)
+	}
 
 	stop := make(chan bool)
 	stop <- true
