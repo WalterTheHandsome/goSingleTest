@@ -26,7 +26,7 @@ const (
 var (
 	txCon *net.IPConn
 	rxCon *net.IPConn
-	IPMap = map[string]networkOpt{}
+	IPMap = map[int]networkOpt{}
 )
 
 func check(msg string, err error) {
@@ -40,7 +40,7 @@ func check(msg string, err error) {
 // mac or ipv6 will be the form of "fe80:3c4e:...."
 // so use "." to identify
 func getInterfaces() []string {
-	IPMap = map[string]networkOpt{}
+	IPMap = map[int]networkOpt{}
 	result := []string{}
 	infs, err := net.Interfaces()
 	check("inf", err)
@@ -52,9 +52,10 @@ func getInterfaces() []string {
 		for _, a := range addrs {
 			if strings.Contains(a.String(), ".") && !strings.Contains(a.String(), "169.254.") && !strings.Contains(a.String(), "127.0.0.1") {
 				name := i.Name
+				idx := i.Index
 				ip := strings.Split(a.String(), "/")[0]
 				result = append(result, name+ip)
-				IPMap[name] = networkOpt{name: name, IP: ip, hwAddress: i.HardwareAddr}
+				IPMap[idx] = networkOpt{name: name, IP: ip, hwAddress: i.HardwareAddr}
 			}
 		}
 	}
@@ -115,8 +116,8 @@ func main() {
 	fmt.Println(opts)
 	fmt.Println(IPMap)
 
-	from := flag.String("s", "", "source interface name")
-	to := flag.String("d", "", "destination interface name")
+	from := flag.Int("s", -1, "source interface name")
+	to := flag.Int("d", -1, "destination interface name")
 	msg := flag.String("m", "walter", "msg to send")
 	flag.Parse()
 
