@@ -87,9 +87,9 @@ func startSendMessages(from, to, msg string) {
 		log.Fatalf("failed to marshal ethernet frame: %v", err)
 	}
 
-	fmt.Println("openlive => ", to)
+	fmt.Println("openlive => ", from)
 
-	handler, err := pcap.OpenLive(to, 1600, true, pcap.BlockForever)
+	handler, err := pcap.OpenLive(from, 1600, true, pcap.BlockForever)
 	check("openlive send", err)
 	for {
 		time.Sleep(time.Second)
