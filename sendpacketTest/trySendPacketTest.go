@@ -41,6 +41,11 @@ func check(msg string, err error) {
 // mac or ipv6 will be the form of "fe80:3c4e:...."
 // so use "." to identify
 func getInterfaces() {
+	devs, err := pcap.FindAllDevs()
+	check("find all devs error", err)
+	for _, d := range devs {
+		fmt.Println(d)
+	}
 	IPMap = map[int]networkOpt{}
 	infs, err := net.Interfaces()
 	check("inf", err)
@@ -86,7 +91,7 @@ func startSendMessages(from, to, msg string) {
 
 	fmt.Println("openlive => ", from)
 
-	handle, err := pcap.OpenLive(addC(from), 1600, false, 100)
+	handle, err := pcap.OpenLive(from, 1600, false, 100)
 	fmt.Println("send handler is", handle)
 	check("openlive send", err)
 	for {
@@ -96,15 +101,9 @@ func startSendMessages(from, to, msg string) {
 	}
 }
 
-func addC(from string) string {
-	temp := []byte(from)
-	temp = append(temp, 0)
-	return string(temp)
-}
-
 func startReceiveMessages(ifName string) {
 	fmt.Println("start receive")
-	handle, err := pcap.OpenLive(addC(ifName), 1600, false, 100)
+	handle, err := pcap.OpenLive(ifName, 1600, false, 100)
 	fmt.Println("receive handler is ", handle)
 	check("openlive receive", err)
 
