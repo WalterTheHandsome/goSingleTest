@@ -72,11 +72,11 @@ func getInterfaces() {
 
 }
 
-func startSendMessages(from, to, msg string) {
+func startSendMessages(from, to networkOpt, msg string) {
 	fmt.Println("start send")
 	// // Message is broadcast to all machines in same network segment.
-	fromIfi, err := net.InterfaceByName(from)
-	toIfi, err := net.InterfaceByName(to)
+	fromIfi, err := net.InterfaceByName(from.NameUI)
+	toIfi, err := net.InterfaceByName(to.NameUI)
 
 	fmt.Println("msg", msg)
 
@@ -93,8 +93,13 @@ func startSendMessages(from, to, msg string) {
 	}
 
 	fmt.Println("openlive => ", from)
-
-	handle, err := pcap.OpenLive(from, 1600, false, pcap.BlockForever)
+	name := ""
+	if runtime.GOOS == "windows" {
+		name = from.NameSys
+	} else {
+		name = from.NameUI
+	}
+	handle, err := pcap.OpenLive(name, 1600, false, pcap.BlockForever)
 	fmt.Println("send handler is", handle)
 	check("openlive send", err)
 	for {
@@ -104,9 +109,15 @@ func startSendMessages(from, to, msg string) {
 	}
 }
 
-func startReceiveMessages(ifName string) {
+func startReceiveMessages(from networkOpt) {
 	fmt.Println("start receive")
-	handle, err := pcap.OpenLive(ifName, 1600, false, pcap.BlockForever)
+	name := ""
+	if runtime.GOOS == "windows" {
+		name = from.NameSys
+	} else {
+		name = from.NameUI
+	}
+	handle, err := pcap.OpenLive(name, 1600, false, pcap.BlockForever)
 	fmt.Println("receive handler is ", handle)
 	check("openlive receive", err)
 
@@ -129,13 +140,8 @@ func main() {
 	msg := flag.String("m", "walter", "msg to send")
 	flag.Parse()
 
-	if runtime.GOOS == "windows" {
-		go startReceiveMessages(interfaceMap[*to].NameSys)
-		go startSendMessages(interfaceMap[*from].NameSys, interfaceMap[*to].NameSys, *msg)
-	} else {
-		go startReceiveMessages(interfaceMap[*to].NameUI)
-		go startSendMessages(interfaceMap[*from].NameUI, interfaceMap[*to].NameUI, *msg)
-	}
+	go startReceiveMessages(interfaceMap[*to])
+	go startSendMessages(interfaceMap[*from], interfaceMap[*to], *msg)
 
 	stop := make(chan bool)
 	stop <- true
