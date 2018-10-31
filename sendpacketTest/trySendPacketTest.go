@@ -40,14 +40,13 @@ func check(msg string, err error) {
 // for darwin / win32
 // mac or ipv6 will be the form of "fe80:3c4e:...."
 // so use "." to identify
-func getInterfaces() []string {
+func getInterfaces() {
 	IPMap = map[int]networkOpt{}
-	result := []string{}
 	infs, err := net.Interfaces()
 	check("inf", err)
 	for _, i := range infs {
+		fmt.Println("interface is", i)
 		fmt.Println(i.HardwareAddr)
-
 		addrs, err := i.Addrs()
 		check("addr", err)
 		for _, a := range addrs {
@@ -55,12 +54,10 @@ func getInterfaces() []string {
 				name := i.Name
 				idx := i.Index
 				ip := strings.Split(a.String(), "/")[0]
-				result = append(result, name+ip)
 				IPMap[idx] = networkOpt{name: name, IP: ip, hwAddress: i.HardwareAddr}
 			}
 		}
 	}
-	return result
 }
 
 func startSendMessages(from, to, msg string) {
@@ -99,8 +96,6 @@ func startSendMessages(from, to, msg string) {
 	}
 }
 
-// receiveMessages continuously receives messages over a connection. The messages
-// may be up to the interface's MTU in size.
 func startReceiveMessages(ifName string) {
 	fmt.Println("start receive")
 	handle, err := pcap.OpenLive(ifName, 1600, true, pcap.BlockForever)
@@ -116,8 +111,7 @@ func startReceiveMessages(ifName string) {
 }
 
 func main() {
-	opts := getInterfaces()
-	fmt.Println(opts)
+	getInterfaces()
 	fmt.Println(IPMap)
 
 	from := flag.Int("from", -1, "source interface index")
