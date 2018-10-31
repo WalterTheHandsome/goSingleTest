@@ -86,7 +86,7 @@ func startSendMessages(from, to, msg string) {
 
 	fmt.Println("openlive => ", from)
 
-	handle, err := pcap.OpenLive(from, 1600, false, 100)
+	handle, err := pcap.OpenLive(addC(from), 1600, false, 100)
 	fmt.Println("send handler is", handle)
 	check("openlive send", err)
 	for {
@@ -96,9 +96,15 @@ func startSendMessages(from, to, msg string) {
 	}
 }
 
+func addC(from string) string {
+	temp := []byte(from)
+	temp = append(temp, 0)
+	return string(temp)
+}
+
 func startReceiveMessages(ifName string) {
 	fmt.Println("start receive")
-	handle, err := pcap.OpenLive(ifName, 1600, false, 100)
+	handle, err := pcap.OpenLive(addC(ifName), 1600, false, 100)
 	fmt.Println("receive handler is ", handle)
 	check("openlive receive", err)
 
