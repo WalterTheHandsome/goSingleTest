@@ -44,6 +44,8 @@ func getInterfaces() {
 
 	infs, err := net.Interfaces()
 	check("inf", err)
+	devs, err := pcap.FindAllDevs()
+	check("find all devs error", err)
 	for _, i := range infs {
 		addrs, err := i.Addrs()
 		check("addr", err)
@@ -51,20 +53,12 @@ func getInterfaces() {
 			if strings.Contains(a.String(), ".") && !strings.Contains(a.String(), "169.254.") && !strings.Contains(a.String(), "127.0.0.1") {
 				name := i.Name
 				ip := strings.Split(a.String(), "/")[0]
-				interfaceMap[ip] = networkOpt{NameUI: name, IP: ip, hwAddress: i.HardwareAddr}
-			}
-		}
-	}
-
-	devs, err := pcap.FindAllDevs()
-	check("find all devs error", err)
-
-	for _, d := range devs {
-		fmt.Println("address", d.Addresses)
-		for _, addr := range d.Addresses {
-			for _, m := range interfaceMap {
-				if m.IP == addr.IP.String() {
-					m.NameSys = d.Name
+				for _, d := range devs {
+					for _, addr := range d.Addresses {
+						if ip == addr.IP.String() {
+							interfaceMap[ip] = networkOpt{NameUI: name, IP: ip, hwAddress: i.HardwareAddr, NameSys: d.Name}
+						}
+					}
 				}
 			}
 		}
@@ -92,13 +86,13 @@ func startSendMessages(from, to networkOpt, msg string) {
 		log.Fatalf("failed to marshal ethernet frame: %v", err)
 	}
 
-	fmt.Println("openlive => ", from)
 	name := ""
 	if runtime.GOOS == "windows" {
 		name = from.NameSys
 	} else {
 		name = from.NameUI
 	}
+	fmt.Println("openlive => ", name)
 	handle, err := pcap.OpenLive(name, 1600, false, pcap.BlockForever)
 	fmt.Println("send handler is", handle)
 	check("openlive send", err)
@@ -117,6 +111,7 @@ func startReceiveMessages(from networkOpt) {
 	} else {
 		name = from.NameUI
 	}
+	fmt.Println("openLive name is", name)
 	handle, err := pcap.OpenLive(name, 1600, false, pcap.BlockForever)
 	fmt.Println("receive handler is ", handle)
 	check("openlive receive", err)
