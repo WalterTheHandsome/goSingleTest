@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/mdlayher/ethernet"
 )
@@ -104,13 +105,11 @@ func startReceiveMessages(ifName string) {
 	handle, err := pcap.OpenLive(ifName, 1600, true, pcap.BlockForever)
 	check("openlive receive", err)
 
-	for {
-		fmt.Println("read")
-		data, _, err := handle.ReadPacketData()
-		check("read err", err)
-		r := &ethernet.Frame{}
-		r.UnmarshalBinary(data)
-		fmt.Println("data ", string(r.Payload))
+	fmt.Println("read")
+	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+	for packet := range packetSource.Packets() {
+		// Process packet here
+		log.Println(packet)
 	}
 
 }
