@@ -5,17 +5,18 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"runtime"
 	"strings"
 	"time"
 
-	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/mdlayher/ethernet"
 )
 
 type networkOpt struct {
 	Idx       int
-	name      string
+	NameUI    string
+	NameSys   string
 	IP        string
 	hwAddress net.HardwareAddr
 }
@@ -26,9 +27,9 @@ const (
 )
 
 var (
-	txCon *net.IPConn
-	rxCon *net.IPConn
-	IPMap = map[int]networkOpt{}
+	txCon        *net.IPConn
+	rxCon        *net.IPConn
+	interfaceMap = map[string]networkOpt{}
 )
 
 func check(msg string, err error) {
@@ -37,43 +38,45 @@ func check(msg string, err error) {
 	}
 }
 
-// for darwin / win32
-// mac or ipv6 will be the form of "fe80:3c4e:...."
-// so use "." to identify
+// This function parse the interface from pcap and net and parse them into 1 structure
 func getInterfaces() {
-	devs, err := pcap.FindAllDevs()
-	check("find all devs error", err)
-	for _, d := range devs {
-		fmt.Println(d)
-	}
-	IPMap = map[int]networkOpt{}
+	interfaceMap = map[string]networkOpt{}
+
 	infs, err := net.Interfaces()
 	check("inf", err)
 	for _, i := range infs {
-		fmt.Println("interface is", i)
-		fmt.Println(i.HardwareAddr)
 		addrs, err := i.Addrs()
 		check("addr", err)
 		for _, a := range addrs {
 			if strings.Contains(a.String(), ".") && !strings.Contains(a.String(), "169.254.") && !strings.Contains(a.String(), "127.0.0.1") {
 				name := i.Name
-				idx := i.Index
 				ip := strings.Split(a.String(), "/")[0]
-				IPMap[idx] = networkOpt{name: name, IP: ip, hwAddress: i.HardwareAddr}
+				interfaceMap[ip] = networkOpt{NameUI: name, IP: ip, hwAddress: i.HardwareAddr}
 			}
 		}
 	}
+
+	devs, err := pcap.FindAllDevs()
+	check("find all devs error", err)
+
+	for _, d := range devs {
+		fmt.Println("address", d.Addresses)
+		for _, addr := range d.Addresses {
+			for _, m := range interfaceMap {
+				if m.IP == addr.IP.String() {
+					m.NameSys = d.Name
+				}
+			}
+		}
+	}
+
 }
 
 func startSendMessages(from, to, msg string) {
 	fmt.Println("start send")
 	// // Message is broadcast to all machines in same network segment.
-	fmt.Println("fromIfi name", from)
 	fromIfi, err := net.InterfaceByName(from)
-	check("from ifi error", err)
-	fmt.Println("toIfi name", to)
 	toIfi, err := net.InterfaceByName(to)
-	check("to ifi err", err)
 
 	fmt.Println("msg", msg)
 
@@ -91,7 +94,7 @@ func startSendMessages(from, to, msg string) {
 
 	fmt.Println("openlive => ", from)
 
-	handle, err := pcap.OpenLive(from, 1600, false, 100)
+	handle, err := pcap.OpenLive(from, 1600, false, pcap.BlockForever)
 	fmt.Println("send handler is", handle)
 	check("openlive send", err)
 	for {
@@ -103,35 +106,35 @@ func startSendMessages(from, to, msg string) {
 
 func startReceiveMessages(ifName string) {
 	fmt.Println("start receive")
-	handle, err := pcap.OpenLive(ifName, 1600, false, 100)
+	handle, err := pcap.OpenLive(ifName, 1600, false, pcap.BlockForever)
 	fmt.Println("receive handler is ", handle)
 	check("openlive receive", err)
 
-	fmt.Println("read")
-	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-	for packet := range packetSource.Packets() {
-		// Process packet here
-		log.Println(packet)
+	for {
+		fmt.Println("read")
+		data, _, err := handle.ReadPacketData()
+		check("read err", err)
+		r := &ethernet.Frame{}
+		r.UnmarshalBinary(data)
+		fmt.Println("data ", string(r.Payload))
 	}
 }
 
 func main() {
 	getInterfaces()
-	fmt.Println(IPMap)
+	fmt.Println(interfaceMap)
 
-	from := flag.Int("from", -1, "source interface index")
-	to := flag.Int("to", -1, "destination interface index")
-	fromName := flag.String("fName", "none", "source interface name")
-	toName := flag.String("toName", "none", "destination interface name")
+	from := flag.String("from", "none", "source interface IP address")
+	to := flag.String("to", "none", "destination interface IP address")
 	msg := flag.String("m", "walter", "msg to send")
 	flag.Parse()
 
-	if *fromName != "none" && *toName != "none" {
-		go startReceiveMessages(*toName)
-		go startSendMessages(*fromName, *toName, *msg)
+	if runtime.GOOS == "windows" {
+		go startReceiveMessages(interfaceMap[*to].NameSys)
+		go startSendMessages(interfaceMap[*from].NameSys, interfaceMap[*to].NameSys, *msg)
 	} else {
-		go startReceiveMessages(IPMap[*to].name)
-		go startSendMessages(IPMap[*from].name, IPMap[*to].name, *msg)
+		go startReceiveMessages(interfaceMap[*to].NameUI)
+		go startSendMessages(interfaceMap[*from].NameUI, interfaceMap[*to].NameUI, *msg)
 	}
 
 	stop := make(chan bool)
