@@ -14,7 +14,6 @@ import (
 )
 
 type networkOpt struct {
-	Idx       int
 	NameUI    string
 	NameSys   string
 	IP        string
@@ -30,6 +29,7 @@ var (
 	txCon        *net.IPConn
 	rxCon        *net.IPConn
 	interfaceMap = map[string]networkOpt{}
+	devNameMap   = map[string]string{}
 )
 
 func check(msg string, err error) {
@@ -46,20 +46,27 @@ func getInterfaces() {
 	check("inf", err)
 	devs, err := pcap.FindAllDevs()
 	check("find all devs error", err)
+
+	// create devName map by ip
+	for _, d := range devs {
+		for _, addr := range d.Addresses {
+			ip := addr.IP.String()
+			if strings.Contains(ip, ".") && !strings.Contains(ip, "169.254.") && !strings.Contains(ip, "127.0.0.1") {
+				devNameMap[ip] = d.Name
+			}
+		}
+	}
+
+	// create interfaceMap by ip
 	for _, i := range infs {
 		addrs, err := i.Addrs()
 		check("addr", err)
 		for _, a := range addrs {
-			if strings.Contains(a.String(), ".") && !strings.Contains(a.String(), "169.254.") && !strings.Contains(a.String(), "127.0.0.1") {
-				name := i.Name
-				ip := strings.Split(a.String(), "/")[0]
-				for _, d := range devs {
-					for _, addr := range d.Addresses {
-						if ip == addr.IP.String() {
-							interfaceMap[ip] = networkOpt{NameUI: name, IP: ip, hwAddress: i.HardwareAddr, NameSys: d.Name}
-						}
-					}
-				}
+			ip := strings.Split(a.String(), "/")[0]
+			name := i.Name
+			// filter off the local and 169.254...
+			if strings.Contains(ip, ".") && !strings.Contains(ip, "169.254.") && !strings.Contains(ip, "127.0.0.1") {
+				interfaceMap[ip] = networkOpt{NameUI: name, NameSys: devNameMap[ip], IP: ip, hwAddress: i.HardwareAddr}
 			}
 		}
 	}
