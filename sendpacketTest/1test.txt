@@ -1,0 +1,74 @@
+*Note that the following information is still in development and some information could change
+**Patch Update 1.4.0 is scheduled for November 22nd, 2018. The Integrated System Maintenance Check that was done on November 7th is not Patch Update 1.4.0.
+[Confirmed New Content]
+1. League 9 Will Open
+1.1 A place for the best of League 8 fighters to stand out!
+1.2 The following contents will be released when League 9 opens.
+2. New Gear and New Grade for Protective Gear
+2.1 New Main Options and New Legendary Gloves and Protective Gear!
+ 6 New Gloves and 12 New Protective Gear added. Devs are determining which Main Options to pair with each Punch Type Gear to improve gameplay.
+2.2 New Protective Gear Grade
+Grading Up Protective Gear to Legendary Grade will be available once League 9 is open.
+To Grade Up Protective Gear to Legendary Grade, Epic Protective Stock Parts can be obtained in the following ways.
+ Shop’s Rotation Section
+League 9 Reward Package
+Products Selling Epic Protective Stock Parts
+2.3 Revealing of New “Chimera” Omega Fusion Gear
+Following the Trinity Omega Fusion Gloves, new concept Omega Fusion Gloves added.
+The name of the new Omega Fusion Gloves is the “Chimera”. The Chimera is comprised of Jab, Hook, and Uppercut Gloves.
+Collect and equip all 3 Chimera Omega Fusion Gloves and the “Force Field” MegaPunch will be unlocked and available.
+When “Force Field” is activated, a powerful shield protects user from opponent’s attacks (excluding MegaPunch)
+Trinity Omega Boxes will no longer be available after the next Patch Update.
+2.4 New Character Max Levels
+Max Level will be raised to 500.
+Starting at Level 100, Skill Points will be acquired instead of increasing base Stats.
+An Achievement Badge will be given every time a certain Level is reached.
+2.5 New Top Attack Skills
+Total of 12 Attack Skills will be added. 4 for each Jab, Hook, and Uppercut Skills.
+These high-level Attack Skills will be comprised of superior offensive firepower and eye-catching movement.
+Make sure to distribute the Skill Points earned evenly in order to maximize efficiency during matches. 
+2.6 New Story Mode Stages Added
+Story Mode will be extended to Stage 14.
+Our naïve Hero is caught up in this dangerous and greedy Boxing World.
+The story reaches its climax!
+Meet and challenge much stronger Bosses.
+Show them who’s boss and win new Costumes!
+  
+[Game System Additions]
+3. Option Modify 
+Option to Change Value will no longer be available.
+A feature will be added to protect Options that users do not want to change during the random changes.
+4. Sponsorship Boost
+Sponsorship Collection Grade 3 and new Gear added
+If the user equips the same Brand Gear and Sponsorship Benefit at the same time, the Gear will be enhanced a level for each completed Sponsorship Collection List Grade. (ie. Sting Bee Collection List Grade 3 + Sting Bee Fight BL = Sting Bee Fight BL + 3 Levels)
+5. Omega Collection Feature
+Once Omega Fusion Set is complete, through the Omega Collection Feature, the user will be able to use the Main Option of the Omega Fusion Gloves even when Omega Fusion Gloves is not equipped.
+[Balance Adjustments]
+6. Omega Fusion Gear Enhanced due to Sponsorship Boost
+Due to the Sponsorship Boost enhancement given to normal and exclusive Gear, Omega Fusion Gloves, which cannot benefit from the Sponsorship Boost, and its Main Option will be enhanced.
+7. League Match Making Improvement
+Improved League Match Making system, which increases the chances for high-ranked users to be matched with other users.
+8. Evasion Data Recalibration
+•Improvements made to correctly collect evasion data. Currently, the system does not register the correct evasion data when a user is hit while punching.
+Doing so, a user’s AI will reflect a more accurate evasion ratio.
+9. Improved AI Attacking Patterns
+Improved AI attack patterns to challenge high-ranked users.
+AI in higher Leagues will fight more aggressively.
+[Future Event]
+10. Christmas Event
+Christmas Event Only Crib will be added to SWANK.
+Limited Christmas Costumes will be available.
+Christmas Event Only Crib will be temporarily opened for free for all users.
+Christmas is a special day for all.
+The Boxing Star team wants to provide a warm atmosphere during this holiday season and hopes that everyone has a great finish to the year.
+[User Comments and Suggestions]
+11. Advertisement Issues
+The Play Ad Button not appearing seems to be a platform issue outside of the Boxing Star application and we are working with the advertising company to find a solution.
+For iOS device users, please note that iOS devices may be blocking the advertisements so make sure to turn off Limit Ad Tracker in the device’s settings.
+12. Bug Reports
+We are currently investigating and checking all of the reported bugs, such as the game freezes and not being able to log back into the game. Some of the issues will be resolved and will be applied to the game in the near future.
+13 Additions to Clan Content
+We are currently developing new content, such as Clan Battles and increasing Clan Members, and will do all that we can to introduce as much new content as soon as we can.
+Thank you for your continual support of Boxing Star.
+We are encouraged by your support and interest in our game and will do our best to provide all users with the best Boxing Star experience.
+- Boxing Star Team
